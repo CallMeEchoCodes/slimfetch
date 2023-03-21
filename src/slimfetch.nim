@@ -22,25 +22,9 @@ proc getPackageCount(): string =
 
   return packagecount
 
-let ramFileSeq: seq[string] = "/proc/meminfo".readLines(3)
+let memUsed = execCmdEx("free -h --giga | grep Mem: | awk '{ print $3 }'")[0].split("\n")[0]
+let memTotal = execCmdEx("free -h --giga | grep Mem: | awk '{ print $2 }'")[0].split("\n")[0]
 
-let memTotalString = ramFileSeq[0].split(" ")[^2]
-let memAvailableString = ramFileSeq[2].split(" ")[^2]
-var memTotalFloat = memTotalString.parseFloat()
-var memUsedFloat = memTotalFloat - memAvailableString.parseFloat()
-var t = 0
-var t2 = 0
-let suffixes: array = ["KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
-
-const divide: float = 1000.0
-
-while memTotalFloat >= 1000:
-  memTotalFloat = memTotalFloat / divide
-  t += 1
-
-while memUsedFloat >= 1000:
-  memUsedFloat = memUsedFloat / divide
-  t2 += 1
 
 stdout.styledWrite(styleBright,
   "╭────────────╮\n",
@@ -51,7 +35,7 @@ stdout.styledWrite(styleBright,
   "│ ", fgBlue, " ", fgDefault, "uptime   │ ", fgBlue, getUptime(), fgDefault, "\n",
   "│ ", fgMagenta, " ", fgDefault, "shell    │ ", fgMagenta, getEnv("SHELL").split("/")[^1], fgDefault, "\n",
   "│ ", fgRed, " ", fgDefault, "packages │ ", fgRed, getPackageCount(), fgDefault, "\n",
-  "│ ", fgYellow, " ", fgDefault, "memory   │ ", fgYellow, formatFloat(memUsedFloat, ffDefault, 3), suffixes[t2], fgDefault, " / ", fgYellow, formatFloat(memTotalFloat, ffDefault, 3), suffixes[t], fgDefault, "\n",
+  "│ ", fgYellow, " ", fgDefault, "memory   │ ", fgYellow, memUsed, fgDefault, " / ", fgYellow, memTotal, fgDefault, "\n",
   "├────────────┤", "\n",
   "│ ", fgWhite, " ", fgDefault, "colors   │ ", resetStyle, fgBlack, "● ", fgRed, "● ", fgGreen, "● ", fgYellow, "● ", fgBlue, "● ", fgMagenta, "● ", fgCyan, "● ", fgWhite, "● ", fgDefault, styleBright, "\n",
   "╰────────────╯ ", fgBlack, "● ", fgRed, "● ", fgGreen, "● ", fgYellow, "● ", fgBlue, "● ", fgMagenta, "● ", fgCyan, "● ", fgWhite, "● ", fgDefault, resetStyle, "\n"
