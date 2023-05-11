@@ -1,3 +1,5 @@
+# ARCHIVED. Please use https://github.com/CallMeEchoCodes/fetcho instead!
+
 # slimfetch
 
 > :clipboard: Simple fetch program written @nim-lang 
